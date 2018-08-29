@@ -35,40 +35,47 @@ int FMOD_Main()
     ERRCHECK( system->initialize(1024, FMOD_STUDIO_INIT_NORMAL, FMOD_INIT_NORMAL, extraDriverData) );
     
     FMOD::Studio::Bank* masterBank = NULL;
-    ERRCHECK( system->loadBankFile(Common_MediaPath("Master Bank.bank"), FMOD_STUDIO_LOAD_BANK_NORMAL, &masterBank) );
+    // ERRCHECK( system->loadBankFile(Common_MediaPath("Master Bank.bank"), FMOD_STUDIO_LOAD_BANK_NORMAL, &masterBank) );
+    ERRCHECK( system->loadBankFile(Common_MediaPath("TestBank/Mobile/Master Bank.bank"), FMOD_STUDIO_LOAD_BANK_NORMAL, &masterBank) );
     
     FMOD::Studio::Bank* stringsBank = NULL;
-    ERRCHECK( system->loadBankFile(Common_MediaPath("Master Bank.strings.bank"), FMOD_STUDIO_LOAD_BANK_NORMAL, &stringsBank) );
+    ERRCHECK( system->loadBankFile(Common_MediaPath("TestBank/Mobile/Master Bank.strings.bank"), FMOD_STUDIO_LOAD_BANK_NORMAL, &stringsBank) );
     
-    FMOD::Studio::Bank* ambienceBank = NULL;
-    ERRCHECK( system->loadBankFile(Common_MediaPath("Surround_Ambience.bank"), FMOD_STUDIO_LOAD_BANK_NORMAL, &ambienceBank) );
-    
-    FMOD::Studio::Bank* menuBank = NULL;
-    ERRCHECK( system->loadBankFile(Common_MediaPath("UI_Menu.bank"), FMOD_STUDIO_LOAD_BANK_NORMAL, &menuBank) );
-    
-    FMOD::Studio::Bank* weaponsBank = NULL;
-    ERRCHECK( system->loadBankFile(Common_MediaPath("Weapons.bank"), FMOD_STUDIO_LOAD_BANK_NORMAL, &weaponsBank) );
+    // FMOD::Studio::Bank* ambienceBank = NULL;
+    // ERRCHECK( system->loadBankFile(Common_MediaPath("Surround_Ambience.bank"), FMOD_STUDIO_LOAD_BANK_NORMAL, &ambienceBank) );
+    //
+    // FMOD::Studio::Bank* menuBank = NULL;
+    // ERRCHECK( system->loadBankFile(Common_MediaPath("UI_Menu.bank"), FMOD_STUDIO_LOAD_BANK_NORMAL, &menuBank) );
+    //
+    // FMOD::Studio::Bank* weaponsBank = NULL;
+    // ERRCHECK( system->loadBankFile(Common_MediaPath("Weapons.bank"), FMOD_STUDIO_LOAD_BANK_NORMAL, &weaponsBank) );
 
-    // Get the Looping Ambience event
-    FMOD::Studio::EventDescription* loopingAmbienceDescription = NULL;
-    ERRCHECK( system->getEvent("event:/Ambience/Country", &loopingAmbienceDescription) );
+    // // Get the Looping Ambience event
+    // FMOD::Studio::EventDescription* loopingAmbienceDescription = NULL;
+    // ERRCHECK( system->getEvent("event:/Ambience/Country", &loopingAmbienceDescription) );
     
-    FMOD::Studio::EventInstance* loopingAmbienceInstance = NULL;
-    ERRCHECK( loopingAmbienceDescription->createInstance(&loopingAmbienceInstance) );
-    
-    // Get the 4 Second Surge event
-    FMOD::Studio::EventDescription* cancelDescription = NULL;
-    ERRCHECK( system->getEvent("event:/UI/Cancel", &cancelDescription) );
-    
-    FMOD::Studio::EventInstance* cancelInstance = NULL;
-    ERRCHECK( cancelDescription->createInstance(&cancelInstance) );
+    // FMOD::Studio::EventInstance* loopingAmbienceInstance = NULL;
+    // ERRCHECK( loopingAmbienceDescription->createInstance(&loopingAmbienceInstance) );
+    //
+    // // Get the 4 Second Surge event
+    // FMOD::Studio::EventDescription* cancelDescription = NULL;
+    // ERRCHECK( system->getEvent("event:/UI/Cancel", &cancelDescription) );
+    //
+    // FMOD::Studio::EventInstance* cancelInstance = NULL;
+    // ERRCHECK( cancelDescription->createInstance(&cancelInstance) );
     
     // Get the Single Explosion event
     FMOD::Studio::EventDescription* explosionDescription = NULL;
-    ERRCHECK( system->getEvent("event:/Weapons/Explosion", &explosionDescription) );
+    // ERRCHECK( system->getEvent("event:/Weapons/Explosion", &explosionDescription) );
+    ERRCHECK( system->getEvent("event:/tone_pcm", &explosionDescription) );
 
     // Start loading explosion sample data and keep it in memory
     ERRCHECK( explosionDescription->loadSampleData() );
+    
+    // Get the Single Explosion event Streaming
+    FMOD::Studio::EventDescription* explosionStreamingDescription = NULL;
+    ERRCHECK( system->getEvent("event:/tone_streaming", &explosionStreamingDescription) );
+    ERRCHECK( explosionStreamingDescription->loadSampleData() );
 
     do
     {
@@ -88,18 +95,26 @@ int FMOD_Main()
     
         if (Common_BtnPress(BTN_ACTION2))
         {
-            ERRCHECK( loopingAmbienceInstance->start() );
+            // ERRCHECK( loopingAmbienceInstance->start() );
+            // One-shot event
+            FMOD::Studio::EventInstance* eventInstance = NULL;
+            ERRCHECK( explosionStreamingDescription->createInstance(&eventInstance) );
+            
+            ERRCHECK( eventInstance->start() );
+            
+            // Release will clean up the instance when it completes
+            ERRCHECK( eventInstance->release() );
         }
 
         if (Common_BtnPress(BTN_ACTION3))
         {
-            ERRCHECK( loopingAmbienceInstance->stop(FMOD_STUDIO_STOP_IMMEDIATE) );
+            // ERRCHECK( loopingAmbienceInstance->stop(FMOD_STUDIO_STOP_IMMEDIATE) );
         }
 
         if (Common_BtnPress(BTN_ACTION4))
         {
             // Calling start on an instance will cause it to restart if it's already playing
-            ERRCHECK( cancelInstance->start() );
+            // ERRCHECK( cancelInstance->start() );
         }
 
         ERRCHECK( system->update() );
@@ -115,12 +130,12 @@ int FMOD_Main()
         Common_Draw("Press %s to start/restart the cancel sound", Common_BtnStr(BTN_ACTION4));
         Common_Draw("Press %s to quit", Common_BtnStr(BTN_QUIT));
 
-        Common_Sleep(50);
+        Common_Sleep(30);
     } while (!Common_BtnPress(BTN_QUIT));
     
-    ERRCHECK( weaponsBank->unload() );
-    ERRCHECK( menuBank->unload() );
-    ERRCHECK( ambienceBank->unload() );
+    // ERRCHECK( weaponsBank->unload() );
+    // ERRCHECK( menuBank->unload() );
+    // ERRCHECK( ambienceBank->unload() );
     ERRCHECK( stringsBank->unload() );
     ERRCHECK( masterBank->unload() );
 

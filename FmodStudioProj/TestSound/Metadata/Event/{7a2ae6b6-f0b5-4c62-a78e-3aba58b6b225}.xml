@@ -2,7 +2,7 @@
 <objects serializationModel="Studio.01.10.00">
     <object class="Event" id="{7a2ae6b6-f0b5-4c62-a78e-3aba58b6b225}">
         <property name="name">
-            <value>sine0.25secC5Mono</value>
+            <value>tone_pcm</value>
         </property>
         <property name="outputFormat">
             <value>0</value>

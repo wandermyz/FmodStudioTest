@@ -2,7 +2,7 @@
 <objects serializationModel="Studio.01.10.00">
     <object class="Event" id="{9fb0025b-70ac-4395-adae-159eded93964}">
         <property name="name">
-            <value>sine0.25secC5MonoStreaming</value>
+            <value>tone_streaming</value>
         </property>
         <property name="outputFormat">
             <value>0</value>
